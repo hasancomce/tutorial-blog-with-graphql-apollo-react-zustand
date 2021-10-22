@@ -2,6 +2,7 @@ const { ApolloServer } = require('apollo-server')
 const gql = require('graphql-tag')
 const mongoose = require('mongoose')
 require('dotenv').config()
+const PostModel = require('./models/Post')
 
 const allPosts = [
     {
@@ -35,14 +36,15 @@ const typeDefs = gql`
     }
 
     type Query {
-        GetAllPosts: [Post]
+        getAllPosts: [Post]
     }
 `;
 
 const resolvers = {
     Query: {
-        GetAllPosts() {
-            return allPosts
+        async getAllPosts() {
+            const response = await PostModel.find()
+            return response
         }
     }
 }
