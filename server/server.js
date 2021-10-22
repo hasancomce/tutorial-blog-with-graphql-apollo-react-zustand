@@ -7,18 +7,19 @@ const PostModel = require('./models/Post')
 const typeDefs = gql`
 
     type Post {
-        id: ID!,
-        title: String!,
+        id: ID!
+        title: String!
         content: String!
     }
 
     type Query {
-        getAllPosts: [Post]!,
+        getAllPosts: [Post]!
         getSinglePost(id:ID!): Post!
     }
 
     type Mutation {
         addNewPost(title:String!, content:String!): Post!
+        deletePost(id:ID!):String!
     }
 `;
 
@@ -28,7 +29,11 @@ const resolvers = {
             return await PostModel.find()
         },
         getSinglePost: async (parent, args) => {
-            return await PostModel.findById(args.id)
+            try {
+                return await PostModel.findById(args.id)
+            } catch (error) {
+                throw new error
+            }
         }
     },
     Mutation: {
@@ -38,10 +43,18 @@ const resolvers = {
                     title: args.title,
                     content: args.content
                 }
-                console.log(parent);
                 return await PostModel.create(newPost)
             } catch (error) {
                 throw new error;
+            }
+        },
+        deletePost: async (parent, args) => {
+            try {
+                return await PostModel.deleteOne({"_id": args.id }).then(res => {
+                    return "Post deleted successfully!"
+                })
+            } catch (error) {
+                throw new error
             }
         }
     }
