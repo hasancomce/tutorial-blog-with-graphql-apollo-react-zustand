@@ -1,5 +1,6 @@
 const { ApolloServer } = require('apollo-server')
 const gql = require('graphql-tag')
+const mongoose = require('mongoose')
 require('dotenv').config()
 
 const allPosts = [
@@ -51,6 +52,11 @@ const server = new ApolloServer({
     resolvers
 })
 
-server.listen({ port: 5000 }).then(res => {
+mongoose.connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+}).then(async ()=> {
+    console.log("MongoDB connection successfully")
+    const res = await server.listen({ port: 5000 })
     console.log(`Server is running at ${res.url}`)
 })
