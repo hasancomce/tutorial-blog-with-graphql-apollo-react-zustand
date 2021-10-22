@@ -4,29 +4,6 @@ const mongoose = require('mongoose')
 require('dotenv').config()
 const PostModel = require('./models/Post')
 
-const allPosts = [
-    {
-        id: "1",
-        title: "Post 1 Title",
-        content: "Post 1 Content"
-    },
-    {
-        id: "2",
-        title: "Post 2 Title",
-        content: "Post 2 Content"
-    },
-    {
-        id: "3",
-        title: "Post 3 Title",
-        content: "Post 3 Content"
-    },
-    {
-        id: "4",
-        title: "Post 4 Title",
-        content: "Post 4 Content"
-    },
-]
-
 const typeDefs = gql`
 
     type Post {
@@ -36,15 +13,36 @@ const typeDefs = gql`
     }
 
     type Query {
-        getAllPosts: [Post]
+        getAllPosts: [Post]!,
+        getSinglePost(id:ID!): Post!
+    }
+
+    type Mutation {
+        addNewPost(title:String!, content:String!): Post!
     }
 `;
 
 const resolvers = {
     Query: {
-        async getAllPosts() {
-            const response = await PostModel.find()
-            return response
+        getAllPosts: async () => {
+            return await PostModel.find()
+        },
+        getSinglePost: async (parent, args) => {
+            return await PostModel.findById(args.id)
+        }
+    },
+    Mutation: {
+        addNewPost: async (parent, args) => {
+            try {
+                const newPost = {
+                    title: args.title,
+                    content: args.content
+                }
+                console.log(parent);
+                return await PostModel.create(newPost)
+            } catch (error) {
+                throw new error;
+            }
         }
     }
 }
